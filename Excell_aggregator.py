@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import sys
 
 
 # Set directory where images are stored
@@ -36,31 +37,51 @@ def read_file(file_path):
 
 
 # Ask user to select columns to keep
-def get_selected_columns(df):
-    """Asks the user for column selection and validates input. Input is a dataframe"""
+def get_selected_columns(df, input_folder):
+    """
+    Asks the user for column selection and validates input. If the user presses Enter,
+    it reads column names from 'columns.txt' in the input folder.
 
-    print("\nIf you want to select ALL columns, type ALL. Else you can choose amomngst the available columns:")
-    available_columns = df.columns.tolist()
-    print(available_columns)
+    Parameters:
+    - df (pd.DataFrame): The dataframe to select columns from.
+    - input_folder (str): The folder where 'columns.txt' is located.
+
+    Returns:
+    - list: A list of selected column names.
+    """
+    print("\nIf you want to select ALL columns, type ALL. If you want to use predefined columns, press Enter.")
+    print("To exit, press Ctrl+C.")
+    print("Available columns:", df.columns.tolist())
 
     while True:
-        user_input = input("To select ALL the columns, type ALL or enter the column names to keep (comma-separated): ").strip()
+        try:
+            user_input = input("Enter column names (comma-separated), type ALL, or press Enter to load from 'columns.txt': ").strip()
+            
+            if user_input.upper() == "ALL":  
+                return df.columns.tolist()  # Select all columns
+            
+            if not user_input:  # If the user presses Enter
+                file_path = os.path.join(input_folder, "columns.txt")
+                if os.path.exists(file_path):
+                    with open(file_path, "r") as f:
+                        selected_columns = [col.strip() for col in f.read().split(",")]
+                else:
+                    print("Error: 'columns.txt' not found. Please enter column names manually or press Ctrl+C to exit.")
+                    continue  # Ask for input again
+            else:
+                selected_columns = [col.strip() for col in user_input.split(",")]
+
+            # Validate column names
+            missing_columns = [col for col in selected_columns if col not in df.columns]
+            if missing_columns:
+                print(f"Error: The following columns do not exist: {missing_columns}")
+                print("Please check the spelling and try again.")
+            else:
+                return selected_columns  # Return valid columns
         
-        if user_input.upper() == "ALL":  # Check if the user wants all columns
-            return available_columns  # Return all available columns
-        
-        selected_columns = [col.strip() for col in user_input.split(',')]
-
-        # Check for spelling mistakes or missing columns
-        missing_columns = [col for col in selected_columns if col not in available_columns]
-        if missing_columns:
-            print(f"Error: The following columns do not exist: {missing_columns}")
-            print("Please check the spelling and try again.")
-        else:
-            break
-
-
-    return selected_columns
+        except KeyboardInterrupt:
+            print("\nProcess interrupted by user. Exiting...")
+            sys.exit(0)  # Gracefully exit the program
 
 def process_files(input_folder, files, selected_columns, read_file):
     """
@@ -137,7 +158,7 @@ def main():
         print("Error: Could not read the first file to determine columns.")
         return
 
-    selected_columns = get_selected_columns(df)
+    selected_columns = get_selected_columns(df, input_folder)
     processed_dataframes = process_files(input_folder, files, selected_columns, read_file)
     
     save_output(processed_dataframes, input_folder)
