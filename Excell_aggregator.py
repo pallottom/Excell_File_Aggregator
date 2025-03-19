@@ -27,7 +27,7 @@ def read_file(file_path):
     """Reads an Excel or CSV file and returns a DataFrame. Input is a the file path"""
     try:
         if file_path.endswith('.csv'):
-            return pd.read_csv(file_path)
+            return pd.read_csv(file_path, sep=";|,", engine='python')
         else:
             return pd.read_excel(file_path)
     except Exception as e:
