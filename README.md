@@ -36,9 +36,11 @@ If the folder doesn’t exist, it returns an error.
 
 3. Column Selection:
 
-The user will be asked to select the columns to extract. You can type the column names as they are displayed with a comma in between the example _<Skeleton ID, Branch length>_
+The user will be prompted to select the columns to extract.
 
-Optionally, typing <_ALL_> you cna select all columns.
+Type _ALL_ to select all available columns.
+Press _Enter_ to load predefined column names from columns.txt (if the file exists in the input folder).
+Press _Ctrl+C_ to quit the program.
 
 5. Processing Files:
 
