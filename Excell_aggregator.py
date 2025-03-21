@@ -49,7 +49,7 @@ def get_selected_columns(df, input_folder):
     Returns:
     - list: A list of selected column names.
     """
-    print("\nIf you want to select ALL columns, type ALL. If you want to use predefined columns, press Enter.")
+    print("\nIf you want to select ALL columns, type ALL. \nIf you want to use predefined columns, make sure you have in the dtaa folder a columns.txt file and press Enter.")
     print("To exit, press Ctrl+C.")
     print("Available columns:", df.columns.tolist())
 
